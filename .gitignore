@@ -1,4 +1,7 @@
 /.idea
 node_modules/
 
+*.bun
+*.sqlite
+
 .DS_Store

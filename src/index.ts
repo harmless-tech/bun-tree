@@ -2,14 +2,21 @@ import { Hono } from "hono";
 import { logger } from "hono/logger";
 import redirect from "./redirect/redirect";
 import tree from "./tree/tree";
+import { Store } from "./database";
 
 const app = new Hono();
 const port = process.env.PORT || 3000;
 
 const LICENSE_FILE = await Bun.file("LICENSE").text();
 
+// DB Init
+Store.init();
+Store.run("INSERT INTO foo (info) VALUES ($info)", {
+    $info: "This is info, yep!",
+});
+
 // Home
-app.use('*', logger())
+app.use('*', logger());
 app.get("/", (c) => c.json({
     name: "Bun Tree",
     id: "bun-tree",
