@@ -1,10 +1,23 @@
 {
-    "compilerOptions": {
-      "lib": ["ESNext"],
-      "module": "esnext",
-      "target": "esnext",
-      "moduleResolution": "node",
-      // "bun-types" is the important part
-      "types": ["bun-types"]
-    }
-  }
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "types": [
+      "bun-types"
+    ],
+    "jsx": "react",
+    "jsxFactory": "jsx",
+    "jsxFragmentFactory": "Fragment",
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
+    "noImplicitAny": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

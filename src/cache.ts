@@ -6,7 +6,7 @@ const options: LRU.Options<any, any> = {
         return new Blob([val, key]).size;
     },
     ttl: 1000 * 60 * 60,
-    ttlResolution: 1000,
+    ttlResolution: 1000
 };
 
 export abstract class Cache {
