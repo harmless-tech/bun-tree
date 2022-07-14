@@ -1,0 +1,14 @@
+{
+  "version": "0.0.2",
+  "name": "bun-tree",
+  "main": "src/index.js",
+  "devDependencies": {
+    "bun-types": "^0.0.83"
+  },
+  "dependencies": {
+    "hono": "^1.6.4"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts"
+  }
+}
