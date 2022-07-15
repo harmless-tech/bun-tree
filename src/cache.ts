@@ -1,11 +1,11 @@
 import * as LRU from "lru-cache";
 
 const options: LRU.Options<any, any> = {
-    maxSize: 5000000, // 5 mb
+    maxSize: 10_000000, // 10 mb
     sizeCalculation: (val, key) => {
         return new Blob([val, key]).size;
     },
-    ttl: 1000 * 60 * 60,
+    ttl: 1000 * 60 * 60, // 1 hour
     ttlResolution: 1000
 };
 
@@ -22,5 +22,9 @@ export abstract class Cache {
 
     public static get?(key: string): string {
         return this.cache.get(key);
+    }
+
+    public static delete(key: string): boolean {
+        return this.cache.delete(key);
     }
 }

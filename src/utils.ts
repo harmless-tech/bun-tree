@@ -12,6 +12,14 @@ const STATUS_TEAPOT: StatusCode = 418;
 // MIME Types (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types)
 const MIME_TYPE_JSON = "application/json";
 
+// Gen
+function bufferToHex(buffer: Uint8Array) {
+    let str = "";
+    let hex = "0123456789ABCDEF";
+    buffer.forEach((v) => { str += hex[v >> 4] + hex[v & 15]; });
+    return str;
+}
+
 export default {
     STATUS_FOUND,
     STATUS_BAD_REQUEST,
@@ -21,5 +29,7 @@ export default {
     STATUS_NOT_FOUND,
     STATUS_TEAPOT,
 
-    MIME_TYPE_JSON
+    MIME_TYPE_JSON,
+
+    bufferToHex
 }

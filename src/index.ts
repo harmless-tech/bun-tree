@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
+import { cookie } from "hono/cookie";
 import redirect from "./redirect/redirect";
 import tree from "./tree/tree";
 import { AdminStore, RedirectStore, TreeStore } from "./database";
@@ -16,7 +17,7 @@ TreeStore.init();
 RedirectStore.init();
 
 // Home
-app.use('*', logger());
+app.use('*', logger(), cookie());
 app.get("/", (c) => c.json({
     name: "Bun Tree",
     id: "bun-tree",

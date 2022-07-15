@@ -1,4 +1,5 @@
 import { Database, SQLQueryBindings, Statement } from "bun:sqlite";
+import { Cache } from "./cache";
 
 function createTableQuery(table: string, cols: string): string {
     return `CREATE TABLE IF NOT EXISTS ${table} (${cols})`;
@@ -57,19 +58,45 @@ export abstract class TreeStore {
     private static readonly TABLE_TOKENS = "tree_tokens";
 
     public static init() {
-        Store.run(createTableQuery(this.TABLE_TREE_USERS, "id INTEGER PRIMARY KEY AUTOINCREMENT, user CHARACTER(50) UNIQUE NOT NULL, hashed_password CHARACTER(128), salt TEXT"));
+        Store.run(createTableQuery(this.TABLE_TREE_USERS, "id INTEGER PRIMARY KEY AUTOINCREMENT, user CHARACTER(50) UNIQUE NOT NULL, hashed_password CHARACTER(1024), salt TEXT"));
         Store.run(createTableQuery(this.TABLE_TREE, "id INTEGER PRIMARY KEY, tree_data TEXT, custom_icon_url CHARACTER(512), custom_css TEXT"));
         Store.run(createTableQuery(this.TABLE_STATS, "id INTEGER PRIMARY KEY, service CHARACTER(50) NOT NULL, r_amount INTEGER"));
-        Store.run(createTableQuery(this.TABLE_TOKENS, "id INTEGER PRIMARY KEY, token TEXT UNIQUE NOT NULL"));
+        Store.run(createTableQuery(this.TABLE_TOKENS, "id INTEGER PRIMARY KEY, token TEXT UNIQUE NOT NULL, expiry TEXT NOT NULL"));
     }
 }
 
+const ADMIN_TOKEN = "admin_token";
 export abstract class AdminStore {
-    private static readonly TABLE_ADMIN = "admin_users";
+    // private static readonly TABLE_ADMIN = "admin_users"; // Not needed only one admin currently.
     private static readonly TABLE_TOKENS = "admin_tokens";
 
+    private static readonly TOKEN_QUERY = Store.query(`SELECT * FROM ${this.TABLE_TOKENS} WHERE token = ?`);
+    private static readonly TOKEN_DELETE_QUERY = Store.query(`DELETE FROM ${this.TABLE_TOKENS} WHERE token = ?`);
+
     public static init() {
-        Store.run(createTableQuery(this.TABLE_ADMIN, "id INTEGER PRIMARY KEY AUTOINCREMENT, admin CHARACTER(50) UNIQUE NOT NULL, hashed_password CHARACTER(128) NOT NULL, salt TEXT NOT NULL"));
-        Store.run(createTableQuery(this.TABLE_TOKENS, "id INTEGER PRIMARY KEY, token TEXT UNIQUE NOT NULL"));
+        // Store.run(createTableQuery(this.TABLE_ADMIN, "id INTEGER PRIMARY KEY AUTOINCREMENT, admin CHARACTER(50) UNIQUE NOT NULL, hashed_password CHARACTER(1024) NOT NULL, salt TEXT NOT NULL"));
+        Store.run(createTableQuery(this.TABLE_TOKENS, "id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT UNIQUE NOT NULL, expiry TEXT NOT NULL"));
+    }
+
+    public static isAdmin(token: string): boolean {
+        if(token.length < 1024) {
+            const cached = Cache.get(ADMIN_TOKEN);
+            if(cached)
+                return token === cached;
+            else {
+                let result = this.TOKEN_QUERY.get(token);
+                if(result) {
+                    if(Date.now() < new Date(result.expiry).getUTCMilliseconds()) {
+                        Cache.set(ADMIN_TOKEN, result.token);
+                        return true;
+                    }
+                    else {
+                        this.TOKEN_DELETE_QUERY.run(token);
+                        Cache.delete(ADMIN_TOKEN);
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
