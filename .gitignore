@@ -3,5 +3,6 @@ node_modules/
 
 *.bun
 *.sqlite
+redirects.json
 
 .DS_Store
