@@ -1,12 +1,12 @@
 import { Hono } from "hono";
+import { RegExpRouter } from "hono/router/reg-exp-router";
 import { logger } from "hono/logger";
-import { cookie } from "hono/cookie";
 import redirect from "./redirect/redirect";
 import tree from "./tree/tree";
 import { AdminStore, RedirectStore, TreeStore } from "./database";
 import admin from "./admin/admin";
 
-const app = new Hono();
+const app = new Hono({ router: new RegExpRouter() });
 const port = process.env.PORT || 3000;
 
 const LICENSE_FILE = await Bun.file("LICENSE").text();
@@ -17,7 +17,7 @@ TreeStore.init();
 RedirectStore.init();
 
 // Home
-app.use('*', logger(), cookie());
+app.use('*', logger());
 app.get("/", (c) => c.json({
     name: "Bun Tree",
     id: "bun-tree",
@@ -29,7 +29,11 @@ app.get("/", (c) => c.json({
     issues: "https://github.com/harmless-tech/bun-tree/issues"
 }));
 app.get("license", (c) => c.text(LICENSE_FILE));
-app.notFound((c) => c.text("Not Found", 404))
+app.notFound((c) => c.text("Not Found", 404));
+app.onError((err, c) => {
+    console.error(err);
+    return c.text("Internal Server Error", 500);
+});
 
 // Routes
 app.route("/admin", admin);

@@ -1,6 +1,7 @@
 import { StatusCode } from "hono/dist/utils/http-status";
 
 // Status Codes (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+const STATUS_OKAY: StatusCode = 200;
 const STATUS_FOUND: StatusCode = 300;
 const STATUS_BAD_REQUEST: StatusCode = 400;
 const STATUS_UNAUTHORIZED: StatusCode = 401;
@@ -21,6 +22,7 @@ function bufferToHex(buffer: Uint8Array) {
 }
 
 export default {
+    STATUS_OKAY,
     STATUS_FOUND,
     STATUS_BAD_REQUEST,
     STATUS_UNAUTHORIZED,

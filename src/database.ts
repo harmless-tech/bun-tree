@@ -65,7 +65,7 @@ export abstract class TreeStore {
     }
 }
 
-const ADMIN_TOKEN = "admin_token";
+export const ADMIN_TOKEN = "ADMIN_TOKEN";
 export abstract class AdminStore {
     // private static readonly TABLE_ADMIN = "admin_users"; // Not needed only one admin currently.
     private static readonly TABLE_TOKENS = "admin_tokens";
@@ -98,5 +98,15 @@ export abstract class AdminStore {
             }
         }
         return false;
+    }
+
+    public static removeAdminToken(token: string): void {
+        if(token.length < 1024) {
+            let result = this.TOKEN_QUERY.get(token);
+            if(result) {
+                Cache.delete(ADMIN_TOKEN);
+                this.TOKEN_DELETE_QUERY.run(token);
+            }
+        }
     }
 }
